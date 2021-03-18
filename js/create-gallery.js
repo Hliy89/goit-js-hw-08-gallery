@@ -3,19 +3,21 @@ import images from "./gallery-items.js"
 const portfolioContainer = document.querySelector(".js-gallery");
 const cardsEl = createColorCardsMarkup(images);
 portfolioContainer.insertAdjacentHTML('beforeend', cardsEl);
+let index;
 
 function createColorCardsMarkup(images) {
-    return images.map(({ preview, original, description }) => {
+    return images.map((image, index) => {
         return `
     <li class="gallery__item">
     <a
         class="gallery__link"
-        href="${original}"
+        href="${image.original}"
     ><img
         class="gallery__image"
-        src="${preview}"
-        data-source="${original}"
-        alt="${description}"
+        src="${image.preview}"
+        data-source="${image.original}"
+        alt="${image.description}"
+        data-index="${index}"
         />
     </a>
     </li>
@@ -39,35 +41,60 @@ function onPalletContainerClick(event) {
     }
     const imgDataSource = event.target.dataset.source;
     const imgAlt = event.target.getAttribute('alt');
+    index = +event.target.dataset.index;
     lightBoxImg.src = imgDataSource;
     lightBoxImg.alt = imgAlt;
     onOpenModalBtn();
+    
 }
 
 function onOpenModalBtn() {
-    window.addEventListener('keydown', onEscKeyPress)
+    window.addEventListener('keydown', onEscKeyPress);
+    window.addEventListener('keydown', onLeftRightKeyPress);
     lightBox.classList.add("is-open");
 }
 
 function onCloseModalBtn() {
-    window.removeEventListener('keydown', onEscKeyPress)
+    window.removeEventListener('keydown', onEscKeyPress);
+    window.removeEventListener('keydown', onLeftRightKeyPress);
     lightBox.classList.remove("is-open");
     lightBoxImg.src = "";
     lightBoxImg.alt = "";
 }
 
 function onBackdropClick() {
-    onCloseModalBtn()
+    onCloseModalBtn();
 }
 
 function onEscKeyPress(event) {
     const ESC_KEY_CODE = 'Escape';
     if (event.code === ESC_KEY_CODE) {
-        onCloseModalBtn()
+        onCloseModalBtn();
     }
 }
 
-//                 Разбей задание на несколько подзадач:
+ function onLeftRightKeyPress(event) {
+    const LEFT_KEY = 'ArrowLeft';
+    const RIGHT_KEY = 'ArrowRight';
+     if (event.code === RIGHT_KEY) {
+         if (index === images.length - 1) {
+             index = 0;
+         } else {
+             index += 1;
+          }
+         lightBoxImg.src = images[index].original;
+     }
+     if (event.code === LEFT_KEY) {
+         if (index === 0) {
+             index = images.length - 1;
+         } else {
+             index -= 1;
+          }
+         lightBoxImg.src = images[index].original;
+     } 
+}
+
+    //                 Разбей задание на несколько подзадач:
 
 // -------Создание и рендер разметки по массиву данных и предоставленному шаблону.
 // -------Реализация делегирования на галерее ul.js-gallery и получение url большого изображения.
